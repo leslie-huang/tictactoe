@@ -24,19 +24,25 @@ class Board(object):
         '''
         Print a representation of the board
         '''
+        
         def row_string(row):
+            '''
+            Generate list of (col, row) values using all cols in a given row
+            Return list separated by lines, with Nones represented as spaces
+            '''
             values = [self[x, row] for x in range(self.size)]
             return " | ".join(" " if x is None else str(x) for x in values)
             
-        rows = [row_string(row) for row in range(self.size)]
+        rows = [row_string(row) for row in range(self.size)] # list of rowstringed rows
         
-        lines = "\n" + "-" * len(rows[0]) + "\n"
+        lines = "\n" + "-" * len(rows[0]) + "\n" # spacer line sized to fit the board
                 
         return lines.join(rows)
 
     def winner_for_coords(self, coords):
         '''
         Check if there's a winner given a list of coordinates
+        Returns the player at coords if there is winner
         '''
         values = [self[coord] for coord in coords]
         if len(set(values)) == 1 and None not in values:
@@ -46,7 +52,7 @@ class Board(object):
                 
     def winning_combinations(self):
         '''
-        Generate list of lists, each of which is a winning condition 
+        Generate list of lists, each of which is a winning condition (e.g. a row, column, or diagonal) 
         '''
         nums = range(self.size) # can use for both rows and columns
         
@@ -56,7 +62,7 @@ class Board(object):
         winning_combinations.append(list(zip(nums, nums)))
         winning_combinations.append(list(zip(nums, reversed(nums))))
         
-        # add the winning rows and columns
+        # add the winning row and column combinations
         for row in nums:
             rows = [row] * self.size
             winning_combinations.append(list(zip(rows, nums)))
@@ -66,7 +72,7 @@ class Board(object):
 
     def winner(self, player):
         '''
-        Check if any of the win conditions have been satisfied
+        Check if any of the win conditions have been satisfied by the supplied player
         '''
         return any(player == self.winner_for_coords(combo) for combo in self.winning_combinations())
 
@@ -106,7 +112,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--size", default = 3, type = int, help = "Size of board")
 args = parser.parse_args()
 
-# set up the game 
+### set up the game 
+
 player1 = Player(1, "X")
 player2 = Player(2, "O")
 board = Board(args.size)
@@ -117,6 +124,7 @@ for player in cycle([player1, player2]):
     player.turn(board)
     
     print(board)
+    
     if board.winner(player):
         print("Player {} wins!".format(player.num))
         break
